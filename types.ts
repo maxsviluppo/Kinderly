@@ -14,17 +14,24 @@ export enum AppSection {
   DISCIPLINARY = 'DISCIPLINARY'
 }
 
-export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
+export type TeacherRole = 'prevalente' | 'sostegno' | 'potenziamento' | 'specialista' | 'assistente';
 
-export interface DisciplinaryAction {
+export interface ClassTeacherAssignment {
+  teacherId: string;
+  role: TeacherRole;
+  subject?: string;
+  hoursPerWeek: number;
+  isRotation: boolean;
+  rotationFrequency?: 'weekly' | 'biweekly' | 'monthly';
+}
+
+export interface ClassRoom {
   id: string;
-  studentId: string;
-  type: DisciplinaryType;
-  description: string;
-  date: string;
-  consequence: string;
-  status: 'active' | 'resolved';
-  notifiedParent: boolean;
+  name: string;
+  capacity: number;
+  assignedTeachers: ClassTeacherAssignment[];
+  color: string;
+  description?: string;
 }
 
 export interface SchoolConfig {
@@ -41,6 +48,23 @@ export interface SchoolConfig {
   openingTime: string;
   closingTime: string;
   maxStudentsPerClass: number;
+  isSaturdayOpen: boolean; // Nuova proprietà per il sabato
+}
+
+export interface Ingredient {
+  id: string;
+  name: string;
+  unit: 'kg' | 'l' | 'pz';
+  averagePrice: number;
+  category: 'freschi' | 'secco' | 'surgelati' | 'bevande';
+}
+
+export interface MenuItem {
+  day: string;
+  firstCourse: string;
+  secondCourse: string;
+  side: string;
+  fruit: string;
 }
 
 export interface StaffMember {
@@ -51,15 +75,6 @@ export interface StaffMember {
   hoursPerWeek: number;
   status: 'active' | 'absent' | 'on_leave';
   assignedClass?: string;
-}
-
-export interface ClassRoom {
-  id: string;
-  name: string;
-  capacity: number;
-  assignedTeacherId: string;
-  color: string;
-  description?: string;
 }
 
 export interface AttendanceRecord {
@@ -75,7 +90,7 @@ export interface AttendanceRecord {
 export type AcademicStatus = 'enrolled' | 'promoted' | 'held_back';
 
 export interface FamilyContact {
-  label: string; // es. Madre, Padre, Nonno
+  label: string;
   name: string;
   phone: string;
   email: string;
@@ -88,18 +103,12 @@ export interface Student {
   isPresent: boolean;
   paymentStatus: 'paid' | 'pending' | 'overdue';
   allergies?: string[];
-  parentName: string; // Riferimento principale
-  // Nuovi campi
+  parentName: string;
   birthDate?: string;
   address?: string;
   photo?: string;
   academicStatus: AcademicStatus;
   contacts: FamilyContact[];
-}
-
-export interface Teacher extends StaffMember {
-  role: 'teacher';
-  schedule?: string[];
 }
 
 export interface MaintenanceTask {
@@ -132,4 +141,27 @@ export interface FinancialRecord {
   amount: number;
   date: string;
   description: string;
+}
+
+// Added missing DisciplinaryType, DisciplinaryAction, and Meeting interfaces
+export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
+
+export interface DisciplinaryAction {
+  id: string;
+  studentId: string;
+  type: DisciplinaryType;
+  description: string;
+  date: string;
+  consequence: string;
+  status: 'active' | 'resolved';
+  notifiedParent: boolean;
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  participants: string;
+  type: 'faculty' | 'parents' | 'cda';
 }
