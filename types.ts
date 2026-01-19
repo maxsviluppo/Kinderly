@@ -15,6 +15,7 @@ export enum AppSection {
 }
 
 export type TeacherRole = 'prevalente' | 'sostegno' | 'potenziamento' | 'specialista' | 'assistente';
+export type DietaryPreference = 'ordinario' | 'vegetariano' | 'vegano' | 'celiaco' | 'senza_lattosio';
 
 export interface ClassTeacherAssignment {
   teacherId: string;
@@ -48,7 +49,7 @@ export interface SchoolConfig {
   openingTime: string;
   closingTime: string;
   maxStudentsPerClass: number;
-  isSaturdayOpen: boolean; // Nuova proprietà per il sabato
+  isSaturdayOpen: boolean;
 }
 
 export interface Ingredient {
@@ -65,6 +66,7 @@ export interface MenuItem {
   secondCourse: string;
   side: string;
   fruit: string;
+  allergens?: string[]; // Esempi: 'glutine', 'lattosio', 'uova'
 }
 
 export interface StaffMember {
@@ -103,6 +105,7 @@ export interface Student {
   isPresent: boolean;
   paymentStatus: 'paid' | 'pending' | 'overdue';
   allergies?: string[];
+  dietaryPreference: DietaryPreference; // Nuova proprietà
   parentName: string;
   birthDate?: string;
   address?: string;
@@ -143,7 +146,6 @@ export interface FinancialRecord {
   description: string;
 }
 
-// Added missing DisciplinaryType, DisciplinaryAction, and Meeting interfaces
 export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
 
 export interface DisciplinaryAction {

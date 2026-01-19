@@ -49,7 +49,7 @@ export const MOCK_SCHOOL_CONFIG: SchoolConfig = {
   openingTime: "08:00",
   closingTime: "16:30",
   maxStudentsPerClass: 25,
-  isSaturdayOpen: true // Attivato per testare la dinamicità
+  isSaturdayOpen: true
 };
 
 export const MOCK_INGREDIENTS: Ingredient[] = [
@@ -60,15 +60,16 @@ export const MOCK_INGREDIENTS: Ingredient[] = [
   { id: 'i5', name: 'Mele Golden', unit: 'pz', averagePrice: 0.35, category: 'freschi' },
   { id: 'i6', name: 'Olio Extravergine', unit: 'l', averagePrice: 7.50, category: 'secco' },
   { id: 'i7', name: 'Pane Comune', unit: 'kg', averagePrice: 3.20, category: 'freschi' },
+  { id: 'i8', name: 'Pasta Senza Glutine', unit: 'kg', averagePrice: 4.50, category: 'secco' },
 ];
 
 export const WEEKLY_MENU: MenuItem[] = [
-  { day: 'Lunedì', firstCourse: 'Pasta al pomodoro', secondCourse: 'Polpette di manzo', side: 'Purè di patate', fruit: 'Mela' },
-  { day: 'Martedì', firstCourse: 'Riso in bianco', secondCourse: 'Filetto di platessa', side: 'Carote al vapore', fruit: 'Pera' },
-  { day: 'Mercoledì', firstCourse: 'Pasta al pesto', secondCourse: 'Formaggio fresco', side: 'Insalata mista', fruit: 'Banana' },
-  { day: 'Giovedì', firstCourse: 'Passato di verdure', secondCourse: 'Uovo sodo', side: 'Spinaci saltati', fruit: 'Arancia' },
-  { day: 'Venerdì', firstCourse: 'Pasta al ragù bianco', secondCourse: 'Arrosto di tacchino', side: 'Piselli', fruit: 'Macedonia' },
-  { day: 'Sabato', firstCourse: 'Minestrina', secondCourse: 'Frittata alle erbe', side: 'Zucchine trifolate', fruit: 'Kiwi' },
+  { day: 'Lunedì', firstCourse: 'Pasta al pomodoro', secondCourse: 'Polpette di manzo', side: 'Purè di patate', fruit: 'Mela', allergens: ['glutine', 'lattosio'] },
+  { day: 'Martedì', firstCourse: 'Riso in bianco', secondCourse: 'Filetto di platessa', side: 'Carote al vapore', fruit: 'Pera', allergens: [] },
+  { day: 'Mercoledì', firstCourse: 'Pasta al pesto', secondCourse: 'Formaggio fresco', side: 'Insalata mista', fruit: 'Banana', allergens: ['glutine', 'lattosio', 'frutta_guscio'] },
+  { day: 'Giovedì', firstCourse: 'Passato di verdure', secondCourse: 'Uovo sodo', side: 'Spinaci saltati', fruit: 'Arancia', allergens: ['uova'] },
+  { day: 'Venerdì', firstCourse: 'Pasta al ragù bianco', secondCourse: 'Arrosto di tacchino', side: 'Piselli', fruit: 'Macedonia', allergens: ['glutine'] },
+  { day: 'Sabato', firstCourse: 'Minestrina', secondCourse: 'Frittata alle erbe', side: 'Zucchine trifolate', fruit: 'Kiwi', allergens: ['glutine', 'uova'] },
 ];
 
 export const CANTEEN_EXPENSES = [
@@ -85,7 +86,6 @@ export const MOCK_STAFF: StaffMember[] = [
   { id: '6', name: 'Laura Bassi', role: 'teacher', specificRole: 'Docente Religione', hoursPerWeek: 6, status: 'active' },
 ];
 
-// Added missing MOCK_TEACHERS export
 export const MOCK_TEACHERS = MOCK_STAFF.filter(s => s.role === 'teacher');
 
 export const MOCK_CLASSES: ClassRoom[] = [
@@ -112,66 +112,30 @@ export const MOCK_CLASSES: ClassRoom[] = [
 ];
 
 export const MOCK_STUDENTS: Student[] = [
-  { id: '1', name: 'Marco Rossi', classId: 'Sezione A', isPresent: true, paymentStatus: 'paid', allergies: ['Lattosio'], parentName: 'Mario Rossi', birthDate: '2019-05-12', address: 'Via dei Mille 4, Roma', academicStatus: 'enrolled', contacts: [{ label: 'Padre', name: 'Mario Rossi', phone: '333 1122334', email: 'mario.rossi@email.it' }] },
-  { id: '2', name: 'Giulia Bianchi', classId: 'Sezione A', isPresent: true, paymentStatus: 'pending', parentName: 'Anna Verdi', birthDate: '2019-09-22', address: 'Viale Europa 15, Roma', academicStatus: 'promoted', contacts: [{ label: 'Madre', name: 'Anna Verdi', phone: '334 9988776', email: 'anna.verdi@email.it' }] },
+  { id: '1', name: 'Marco Rossi', classId: 'Sezione A', isPresent: true, paymentStatus: 'paid', allergies: ['Lattosio'], dietaryPreference: 'senza_lattosio', parentName: 'Mario Rossi', birthDate: '2019-05-12', address: 'Via dei Mille 4, Roma', academicStatus: 'enrolled', contacts: [{ label: 'Padre', name: 'Mario Rossi', phone: '333 1122334', email: 'mario.rossi@email.it' }] },
+  { id: '2', name: 'Giulia Bianchi', classId: 'Sezione A', isPresent: true, paymentStatus: 'pending', dietaryPreference: 'celiaco', parentName: 'Anna Verdi', birthDate: '2019-09-22', address: 'Viale Europa 15, Roma', academicStatus: 'promoted', contacts: [{ label: 'Madre', name: 'Anna Verdi', phone: '334 9988776', email: 'anna.verdi@email.it' }] },
+  { id: '3', name: 'Luca Verdi', classId: 'Sezione B', isPresent: true, paymentStatus: 'overdue', dietaryPreference: 'vegetariano', parentName: 'Roberto Verdi', birthDate: '2018-02-14', address: 'Via Garibaldi 8, Roma', academicStatus: 'held_back', contacts: [{ label: 'Padre', name: 'Roberto Verdi', phone: '331 4455667', email: 'rob.verdi@email.it' }] },
 ];
 
 export const MOCK_ATTENDANCE: AttendanceRecord[] = [];
 
-// Added missing MOCK_FINANCE export
 export const MOCK_FINANCE: FinancialRecord[] = [
   { id: '1', type: 'income', category: 'Rette Ottobre', amount: 16500, date: '2023-10-01', description: 'Incasso rette mensili' },
   { id: '2', type: 'expense', category: 'Affitto', amount: 3500, date: '2023-10-05', description: 'Canone locazione mensile' },
-  { id: '3', type: 'expense', category: 'Utenze', amount: 1200, date: '2023-10-10', description: 'Luce, Gas e Acqua' },
-  { id: '4', type: 'expense', category: 'Canteen', amount: 657, date: '2023-10-15', description: 'Approvvigionamenti mensa' },
 ];
 
-// Added missing MOCK_MEETINGS export
 export const MOCK_MEETINGS: Meeting[] = [
   { id: '1', title: 'Collegio Docenti Straordinario', date: '2023-10-25', time: '17:00', participants: 'Tutto lo staff docente', type: 'faculty' },
-  { id: '2', title: 'Incontro Scuola-Famiglia Sezione A', date: '2023-10-28', time: '16:30', participants: 'Genitori Sezione A', type: 'parents' },
 ];
 
-// Added missing MOCK_CONVERSATIONS export
 export const MOCK_CONVERSATIONS = [
   { studentId: '1', lastMessage: 'Grazie per l\'informazione', timestamp: '10:30', unreadCount: 0 },
-  { studentId: '2', lastMessage: 'Giulia domani sarà assente', timestamp: '09:15', unreadCount: 1 },
 ];
 
-// Added missing MOCK_MESSAGES export
 export const MOCK_MESSAGES: Record<string, {senderId: string, text: string, timestamp: string}[]> = {
-  '1': [
-    { senderId: 'parent', text: 'Buongiorno, Marco ha la febbre oggi.', timestamp: '08:00' },
-    { senderId: 'school', text: 'Ricevuto, ci aggiorni presto!', timestamp: '08:15' },
-    { senderId: 'parent', text: 'Grazie per l\'informazione', timestamp: '10:30' },
-  ],
-  '2': [
-    { senderId: 'parent', text: 'Buongiorno, Giulia domani sarà assente per una visita.', timestamp: '09:15' },
-  ]
+  '1': [{ senderId: 'parent', text: 'Buongiorno, Marco ha la febbre oggi.', timestamp: '08:00' }],
 };
 
-// Added missing MOCK_DISCIPLINARY export
-export const MOCK_DISCIPLINARY: DisciplinaryAction[] = [
-  { 
-    id: '1', 
-    studentId: '1', 
-    type: 'ammonimento', 
-    description: 'Ha disturbato i compagni durante il riposino pomeridiano più volte.', 
-    date: '2023-10-20', 
-    consequence: 'Colloquio con i genitori e attività riparatoria assistita.', 
-    status: 'active', 
-    notifiedParent: true 
-  },
-];
-
-// Added missing MOCK_MAINTENANCE export
-export const MOCK_MAINTENANCE: MaintenanceTask[] = [
-  { id: '1', area: 'Giardino Esterno', description: 'Riparazione della staccionata in legno vicino allo scivolo.', status: 'pending', priority: 'high', date: '2023-10-22' },
-  { id: '2', area: 'Aula Piccoli', description: 'Sostituzione lampadine fulminate nel blocco centrale.', status: 'completed', priority: 'low', date: '2023-10-18' },
-];
-
-// Added missing MOCK_MEDICAL_CHECKS export
-export const MOCK_MEDICAL_CHECKS: MedicalCheck[] = [
-  { id: '1', targetId: '1', targetType: 'student', targetName: 'Marco Rossi', type: 'Visita Pediatrica', date: '2023-11-05', professional: 'Dott.ssa Bianchi', status: 'planned' },
-  { id: '2', targetId: '1', targetType: 'staff', targetName: 'Maria Montessori', type: 'Controllo Medico Lavoro', date: '2023-10-15', professional: 'Dott. Neri', status: 'completed' },
-];
+export const MOCK_DISCIPLINARY: DisciplinaryAction[] = [];
+export const MOCK_MAINTENANCE: MaintenanceTask[] = [];
+export const MOCK_MEDICAL_CHECKS: MedicalCheck[] = [];

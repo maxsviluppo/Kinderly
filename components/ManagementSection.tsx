@@ -7,9 +7,9 @@ import {
   LayoutGrid, Sparkles, Loader2, Calendar, Save, Trash2, Edit3,
   X, Phone, Mail, MapPin, User, HeartPulse, GraduationCap, Check, 
   AlertCircle, Camera, Palette, Info, CheckCircle2, BookOpen, Clock, 
-  RefreshCw, ChevronRight
+  RefreshCw, ChevronRight, Leaf, ShieldAlert
 } from 'lucide-react';
-import { ClassRoom, Student, StaffMember, AcademicStatus, FamilyContact, ClassTeacherAssignment, TeacherRole } from '../types';
+import { ClassRoom, Student, StaffMember, AcademicStatus, FamilyContact, ClassTeacherAssignment, TeacherRole, DietaryPreference } from '../types';
 
 interface SectionProps {
   type: 'students' | 'staff' | 'logistics';
@@ -59,7 +59,6 @@ const ManagementSection: React.FC<SectionProps> = ({ type, selectedClassId = 'al
 
   const handleGenerateSchedule = async () => {
     setIsGenerating(true);
-    // Prepariamo i dati arricchiti con le assegnazioni classi per Gemini
     const enrichedStaff = MOCK_STAFF.filter(s => s.role === 'teacher').map(teacher => {
       const teacherClasses = classes.filter(c => c.assignedTeachers.some(at => at.teacherId === teacher.id));
       return {
@@ -94,6 +93,7 @@ const ManagementSection: React.FC<SectionProps> = ({ type, selectedClassId = 'al
         isPresent: false,
         paymentStatus: 'pending',
         allergies: [],
+        dietaryPreference: 'ordinario',
         parentName: '',
         birthDate: '',
         address: '',
@@ -307,7 +307,7 @@ const ManagementSection: React.FC<SectionProps> = ({ type, selectedClassId = 'al
                 <thead>
                   <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                     <th className="px-4 py-4">{type === 'students' ? 'Alunno' : 'Nominativo'}</th>
-                    <th className="px-4 py-4">{type === 'students' ? 'Sezione & Stato' : 'Ruolo'}</th>
+                    <th className="px-4 py-4">{type === 'students' ? 'Sezione & Dietetica' : 'Ruolo'}</th>
                     <th className="px-4 py-4">Salute / Allergeni</th>
                     <th className="px-4 py-4">Contatti</th>
                     <th className="px-4 py-4 text-right">Azioni</th>
@@ -334,11 +334,10 @@ const ManagementSection: React.FC<SectionProps> = ({ type, selectedClassId = 'al
                            </span>
                            {type === 'students' && (
                              <span className={`text-[9px] font-black uppercase tracking-tight ${
-                               item.academicStatus === 'promoted' ? 'text-emerald-500' : 
-                               item.academicStatus === 'held_back' ? 'text-rose-500' : 'text-slate-400'
+                               item.dietaryPreference === 'celiaco' ? 'text-rose-500' : 
+                               item.dietaryPreference === 'vegetariano' ? 'text-emerald-500' : 'text-slate-400'
                              }`}>
-                               {item.academicStatus === 'promoted' ? '✓ Promosso' : 
-                                item.academicStatus === 'held_back' ? '⚠ Non Promosso' : 'Iscritto'}
+                               {item.dietaryPreference === 'ordinario' ? 'Dieta Standard' : item.dietaryPreference.replace('_', ' ')}
                              </span>
                            )}
                          </div>
@@ -392,206 +391,6 @@ const ManagementSection: React.FC<SectionProps> = ({ type, selectedClassId = 'al
           )}
         </div>
       </div>
-
-      {/* Class Management Modal - EVOLUTO PER MULTI-DOCENTE */}
-      {showClassModal && editingClass && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowClassModal(false)} />
-          <div className="bg-white rounded-[40px] w-full max-w-4xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in duration-300">
-             <div className="p-8 bg-indigo-600 text-white flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-white/20 rounded-2xl"><LayoutGrid size={24}/></div>
-                  <div>
-                    <h3 className="text-xl font-black tracking-tight">{classes.find(c => c.id === editingClass.id) ? 'Modifica Sezione' : 'Nuova Sezione'}</h3>
-                    <p className="text-indigo-100 text-[10px] font-black uppercase tracking-widest mt-1">Configurazione Team & Struttura</p>
-                  </div>
-                </div>
-                <button onClick={() => setShowClassModal(false)} className="bg-white/10 p-2 rounded-full hover:rotate-90 transition-all"><X size={20}/></button>
-             </div>
-             
-             <div className="p-8 space-y-8 flex-1 overflow-y-auto">
-                {/* Dati Base Sezione */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Codice Sezione (ID)</label>
-                    <input 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 outline-none focus:border-indigo-400 transition-all"
-                      value={editingClass.id}
-                      onChange={(e) => setEditingClass({...editingClass, id: e.target.value})}
-                      placeholder="es. Sezione C"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nome Descrittivo</label>
-                    <input 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 outline-none focus:border-indigo-400 transition-all"
-                      value={editingClass.name}
-                      onChange={(e) => setEditingClass({...editingClass, name: e.target.value})}
-                      placeholder="es. Sezione Gialla (Medi)"
-                    />
-                  </div>
-                </div>
-
-                {/* Team Docenti - SEZIONE CRITICA */}
-                <div className="space-y-6">
-                   <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                        <GraduationCap size={16}/> Team Docenti Assegnati
-                      </h4>
-                      <button 
-                        onClick={addTeacherToClass}
-                        className="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all flex items-center gap-2"
-                      >
-                        <Plus size={14}/> Aggiungi Docente al Team
-                      </button>
-                   </div>
-
-                   <div className="space-y-4">
-                      {editingClass.assignedTeachers.map((assignment, idx) => (
-                        <div key={idx} className="p-6 bg-slate-50 border border-slate-200 rounded-3xl relative animate-in slide-in-from-left-4 duration-300">
-                           <button 
-                             onClick={() => removeTeacherFromClass(idx)}
-                             className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 transition-colors"
-                           >
-                             <Trash2 size={16}/>
-                           </button>
-                           
-                           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                              <div className="space-y-1">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Nominativo Docente</label>
-                                <select 
-                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-indigo-400"
-                                  value={assignment.teacherId}
-                                  onChange={(e) => updateTeacherAssignment(idx, { teacherId: e.target.value })}
-                                >
-                                  {MOCK_STAFF.filter(s => s.role === 'teacher').map(t => (
-                                    <option key={t.id} value={t.id}>{t.name}</option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Ruolo in Classe</label>
-                                <select 
-                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-indigo-400"
-                                  value={assignment.role}
-                                  onChange={(e) => updateTeacherAssignment(idx, { role: e.target.value as TeacherRole })}
-                                >
-                                  <option value="prevalente">Prevalente</option>
-                                  <option value="sostegno">Sostegno</option>
-                                  <option value="specialista">Specialista</option>
-                                  <option value="potenziamento">Potenziamento</option>
-                                  <option value="assistente">Assistente</option>
-                                </select>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Materia / Area</label>
-                                <div className="relative">
-                                  <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14}/>
-                                  <input 
-                                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-bold outline-none focus:border-indigo-400"
-                                    value={assignment.subject || ''}
-                                    onChange={(e) => updateTeacherAssignment(idx, { subject: e.target.value })}
-                                    placeholder="es. Inglese"
-                                  />
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Ore / Settimana</label>
-                                <div className="relative">
-                                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14}/>
-                                  <input 
-                                    type="number"
-                                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs font-bold outline-none focus:border-indigo-400"
-                                    value={assignment.hoursPerWeek}
-                                    onChange={(e) => updateTeacherAssignment(idx, { hoursPerWeek: parseInt(e.target.value) || 0 })}
-                                  />
-                                </div>
-                              </div>
-                           </div>
-
-                           <div className="mt-4 flex flex-wrap items-center gap-6 border-t border-slate-100 pt-4">
-                              <label className="flex items-center gap-3 cursor-pointer group">
-                                <div className="relative">
-                                  <input 
-                                    type="checkbox" 
-                                    className="peer hidden" 
-                                    checked={assignment.isRotation}
-                                    onChange={(e) => updateTeacherAssignment(idx, { isRotation: e.target.checked })}
-                                  />
-                                  <div className="w-10 h-6 bg-slate-200 rounded-full peer-checked:bg-emerald-500 transition-all"></div>
-                                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-4"></div>
-                                </div>
-                                <span className="text-[10px] font-black uppercase text-slate-500 group-hover:text-slate-800 flex items-center gap-1">
-                                  <RefreshCw size={12}/> In Rotazione
-                                </span>
-                              </label>
-
-                              {assignment.isRotation && (
-                                <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-2">
-                                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Frequenza:</label>
-                                  <select 
-                                    className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-bold outline-none"
-                                    value={assignment.rotationFrequency}
-                                    onChange={(e) => updateTeacherAssignment(idx, { rotationFrequency: e.target.value as any })}
-                                  >
-                                    <option value="weekly">Settimanale</option>
-                                    <option value="biweekly">Ogni 2 settimane</option>
-                                    <option value="monthly">Mensile</option>
-                                  </select>
-                                </div>
-                              )}
-                           </div>
-                        </div>
-                      ))}
-
-                      {editingClass.assignedTeachers.length === 0 && (
-                        <div className="text-center py-10 border-2 border-dashed border-slate-100 rounded-[32px] bg-slate-50/50">
-                           <GraduationCap className="mx-auto text-slate-200 mb-3" size={32} />
-                           <p className="text-xs text-slate-400 font-medium italic">Nessun docente assegnato a questa sezione.</p>
-                        </div>
-                      )}
-                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-slate-100">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Capienza Alunni</label>
-                    <input 
-                      type="number"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 outline-none focus:border-indigo-400 transition-all"
-                      value={editingClass.capacity}
-                      onChange={(e) => setEditingClass({...editingClass, capacity: parseInt(e.target.value)})}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Colore Identificativo</label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {[
-                        {v: 'bg-blue-100 text-blue-700', c: 'bg-blue-500'},
-                        {v: 'bg-emerald-100 text-emerald-700', c: 'bg-emerald-500'},
-                        {v: 'bg-amber-100 text-amber-700', c: 'bg-amber-500'},
-                        {v: 'bg-rose-100 text-rose-700', c: 'bg-rose-500'},
-                      ].map(color => (
-                        <button 
-                          key={color.v}
-                          onClick={() => setEditingClass({...editingClass, color: color.v})}
-                          className={`h-10 rounded-xl transition-all border-4 ${editingClass.color === color.v ? 'border-indigo-600 scale-105 shadow-lg' : 'border-transparent'} ${color.c}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-             </div>
-             
-             <div className="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
-                <button onClick={() => setShowClassModal(false)} className="flex-1 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Annulla</button>
-                <button onClick={handleSaveClass} className="flex-[2] bg-indigo-600 text-white py-4 rounded-[24px] text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center justify-center gap-3">
-                  <Save size={18}/> Salva Sezione e Sincronizza
-                </button>
-             </div>
-          </div>
-        </div>
-      )}
 
       {/* Student Management Modal */}
       {showStudentModal && editingStudent && (
@@ -656,39 +455,49 @@ const ManagementSection: React.FC<SectionProps> = ({ type, selectedClassId = 'al
                       {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Evoluzione / Stato</label>
-                    <div className="flex gap-2">
-                       {['enrolled', 'promoted', 'held_back'].map(status => (
-                         <button 
-                           key={status}
-                           onClick={() => setEditingStudent({...editingStudent, academicStatus: status as AcademicStatus})}
-                           className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase border transition-all ${
-                             editingStudent.academicStatus === status ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
-                           }`}
-                         >
-                           {status === 'enrolled' ? 'Iscritto' : status === 'promoted' ? 'Promosso' : 'Non Prom.'}
-                         </button>
-                       ))}
-                    </div>
-                  </div>
                 </div>
               </div>
 
-              {/* Health & Allergies */}
-              <div className="bg-rose-50/50 p-8 rounded-[40px] border border-rose-100 space-y-4">
+              {/* Health & Dietetics - AGGIORNATO */}
+              <div className="bg-rose-50/50 p-8 rounded-[40px] border border-rose-100 space-y-6">
                  <h4 className="text-xs font-black text-rose-800 uppercase tracking-widest flex items-center gap-2">
-                   <HeartPulse size={16}/> Salute & Intolleranze
+                   <HeartPulse size={16}/> Profilo Dietetico & Salute
                  </h4>
-                 <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Allergeni (Separati da virgola)</label>
-                    <input 
-                      className="w-full bg-white border border-rose-200 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-400 transition-all outline-none"
-                      placeholder="es. Glutine, Lattosio, Arachidi..."
-                      value={editingStudent.allergies?.join(', ')}
-                      onChange={(e) => setEditingStudent({...editingStudent, allergies: e.target.value.split(',').map(a => a.trim()).filter(a => a !== '')})}
-                    />
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Regime Alimentare</label>
+                      <select 
+                        className="w-full bg-white border border-rose-200 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 outline-none"
+                        value={editingStudent.dietaryPreference}
+                        onChange={(e) => setEditingStudent({...editingStudent, dietaryPreference: e.target.value as DietaryPreference})}
+                      >
+                        <option value="ordinario">Ordinario (Senza Restrizioni)</option>
+                        <option value="vegetariano">Vegetariano</option>
+                        <option value="vegano">Vegano</option>
+                        <option value="celiaco">Celiaco (Gluten-Free)</option>
+                        <option value="senza_lattosio">Intollerante Lattosio</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Allergeni Specifici (es. Uova, Soia...)</label>
+                      <input 
+                        className="w-full bg-white border border-rose-200 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-rose-500/10 transition-all outline-none"
+                        placeholder="Separa con virgola..."
+                        value={editingStudent.allergies?.join(', ')}
+                        onChange={(e) => setEditingStudent({...editingStudent, allergies: e.target.value.split(',').map(a => a.trim()).filter(a => a !== '')})}
+                      />
+                    </div>
                  </div>
+
+                 {editingStudent.dietaryPreference !== 'ordinario' && (
+                   <div className="p-4 bg-white/60 border border-rose-200 rounded-2xl flex gap-3 animate-in slide-in-from-top-2">
+                     <ShieldAlert size={20} className="text-rose-600 shrink-0" />
+                     <p className="text-[11px] text-rose-800 font-bold leading-relaxed italic">
+                       Configurazione pasto speciale attivata. Il personale di cucina riceverà notifica automatica per la preparazione della variante compatibile.
+                     </p>
+                   </div>
+                 )}
               </div>
 
               {/* Contacts & Family */}
