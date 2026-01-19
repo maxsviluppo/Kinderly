@@ -16,8 +16,7 @@ import {
   FileText, 
   Save, 
   Plus,
-  Hash,
-  CalendarDays
+  Hash
 } from 'lucide-react';
 import { SchoolConfig } from '../types';
 
@@ -26,10 +25,6 @@ const SettingsSection: React.FC = () => {
 
   const ataStaff = MOCK_STAFF.filter(s => s.role === 'ata');
   const adminStaff = MOCK_STAFF.filter(s => s.role === 'admin');
-
-  const handleToggleSaturday = () => {
-    setConfig(prev => ({ ...prev, isSaturdayOpen: !prev.isSaturdayOpen }));
-  };
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-500">
@@ -64,24 +59,6 @@ const SettingsSection: React.FC = () => {
               <div className="md:col-span-2">
                 <SettingInput label="Indirizzo Sede Operativa" value={config.address} icon={<MapPin size={16}/>} />
               </div>
-              
-              {/* Sabato Lavorativo Toggle */}
-              <div className="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                   <div className="p-3 bg-white rounded-2xl border border-slate-100 text-indigo-600"><CalendarDays size={20}/></div>
-                   <div>
-                     <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Calendario Corto / Lungo</p>
-                     <p className="text-xs text-slate-500 font-medium">Abilita o disabilita le attività didattiche e la mensa per il Sabato.</p>
-                   </div>
-                </div>
-                <button 
-                  onClick={handleToggleSaturday}
-                  className={`w-16 h-8 rounded-full transition-all relative ${config.isSaturdayOpen ? 'bg-emerald-500 shadow-inner' : 'bg-slate-300'}`}
-                >
-                  <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all ${config.isSaturdayOpen ? 'left-9' : 'left-1'}`}></div>
-                </button>
-              </div>
-
               <SettingInput label="Telefono Fisso" value={config.phone} icon={<Phone size={16}/>} />
               <SettingInput label="Cellulare Emergenze" value={config.mobilePhone || ''} icon={<Smartphone size={16}/>} />
               <div className="grid grid-cols-2 gap-4">
@@ -138,6 +115,7 @@ const SettingsSection: React.FC = () => {
 
         {/* Colonna Destra: Staff e Manutenzione */}
         <div className="space-y-8">
+           
            <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm relative overflow-hidden">
              <div className="flex justify-between items-center mb-6 border-b border-slate-50 pb-4">
                 <h3 className="text-lg font-black text-slate-800 flex items-center gap-3">
@@ -179,6 +157,18 @@ const SettingsSection: React.FC = () => {
                 ))}
              </div>
           </div>
+
+           <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[40px] text-white shadow-xl shadow-slate-200 relative overflow-hidden group">
+              <div className="absolute -right-10 -bottom-10 bg-white/5 w-40 h-40 rounded-full blur-3xl group-hover:bg-white/10 transition-all"></div>
+              <h4 className="font-black text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
+                <ShieldCheck size={16} className="text-emerald-400" /> Sistema Kinderly
+              </h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed mb-6 font-medium">
+                Stato: Attivo • Versione 2.4.0 (Paritaria Edition)<br/>
+                Backup Database: Eseguito 4 ore fa.
+              </p>
+              <button className="w-full py-4 bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-slate-900 transition-all border border-white/20">Verifica Aggiornamenti</button>
+           </div>
         </div>
       </div>
     </div>

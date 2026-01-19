@@ -14,25 +14,17 @@ export enum AppSection {
   DISCIPLINARY = 'DISCIPLINARY'
 }
 
-export type TeacherRole = 'prevalente' | 'sostegno' | 'potenziamento' | 'specialista' | 'assistente';
-export type DietaryPreference = 'ordinario' | 'vegetariano' | 'vegano' | 'celiaco' | 'senza_lattosio';
+export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
 
-export interface ClassTeacherAssignment {
-  teacherId: string;
-  role: TeacherRole;
-  subject?: string;
-  hoursPerWeek: number;
-  isRotation: boolean;
-  rotationFrequency?: 'weekly' | 'biweekly' | 'monthly';
-}
-
-export interface ClassRoom {
+export interface DisciplinaryAction {
   id: string;
-  name: string;
-  capacity: number;
-  assignedTeachers: ClassTeacherAssignment[];
-  color: string;
-  description?: string;
+  studentId: string;
+  type: DisciplinaryType;
+  description: string;
+  date: string;
+  consequence: string;
+  status: 'active' | 'resolved';
+  notifiedParent: boolean;
 }
 
 export interface SchoolConfig {
@@ -49,24 +41,6 @@ export interface SchoolConfig {
   openingTime: string;
   closingTime: string;
   maxStudentsPerClass: number;
-  isSaturdayOpen: boolean;
-}
-
-export interface Ingredient {
-  id: string;
-  name: string;
-  unit: 'kg' | 'l' | 'pz';
-  averagePrice: number;
-  category: 'freschi' | 'secco' | 'surgelati' | 'bevande';
-}
-
-export interface MenuItem {
-  day: string;
-  firstCourse: string;
-  secondCourse: string;
-  side: string;
-  fruit: string;
-  allergens?: string[]; // Esempi: 'glutine', 'lattosio', 'uova'
 }
 
 export interface StaffMember {
@@ -77,6 +51,15 @@ export interface StaffMember {
   hoursPerWeek: number;
   status: 'active' | 'absent' | 'on_leave';
   assignedClass?: string;
+}
+
+export interface ClassRoom {
+  id: string;
+  name: string;
+  capacity: number;
+  assignedTeacherId: string;
+  color: string;
+  description?: string;
 }
 
 export interface AttendanceRecord {
@@ -92,7 +75,7 @@ export interface AttendanceRecord {
 export type AcademicStatus = 'enrolled' | 'promoted' | 'held_back';
 
 export interface FamilyContact {
-  label: string;
+  label: string; // es. Madre, Padre, Nonno
   name: string;
   phone: string;
   email: string;
@@ -105,13 +88,18 @@ export interface Student {
   isPresent: boolean;
   paymentStatus: 'paid' | 'pending' | 'overdue';
   allergies?: string[];
-  dietaryPreference: DietaryPreference; // Nuova proprietà
-  parentName: string;
+  parentName: string; // Riferimento principale
+  // Nuovi campi
   birthDate?: string;
   address?: string;
   photo?: string;
   academicStatus: AcademicStatus;
   contacts: FamilyContact[];
+}
+
+export interface Teacher extends StaffMember {
+  role: 'teacher';
+  schedule?: string[];
 }
 
 export interface MaintenanceTask {
@@ -144,26 +132,4 @@ export interface FinancialRecord {
   amount: number;
   date: string;
   description: string;
-}
-
-export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
-
-export interface DisciplinaryAction {
-  id: string;
-  studentId: string;
-  type: DisciplinaryType;
-  description: string;
-  date: string;
-  consequence: string;
-  status: 'active' | 'resolved';
-  notifiedParent: boolean;
-}
-
-export interface Meeting {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  participants: string;
-  type: 'faculty' | 'parents' | 'cda';
 }
