@@ -66,12 +66,21 @@ const AttendanceSection: React.FC<AttendanceProps> = ({ selectedClassId = 'all' 
       const updatedRecords = [...prev];
       
       if (existingIdx > -1) {
-        updatedRecords[existingIdx] = {
-          ...updatedRecords[existingIdx],
-          status: 'present',
-          arrivalTime: currentTime,
-          notes: 'Entrata in ritardo'
-        };
+        // Logica Toggle: se è già segnato come ritardo, lo rimuovo (torna a presenza semplice)
+        if (updatedRecords[existingIdx].notes === 'Entrata in ritardo') {
+          updatedRecords[existingIdx] = {
+            ...updatedRecords[existingIdx],
+            arrivalTime: undefined,
+            notes: undefined
+          };
+        } else {
+          updatedRecords[existingIdx] = {
+            ...updatedRecords[existingIdx],
+            status: 'present',
+            arrivalTime: currentTime,
+            notes: 'Entrata in ritardo'
+          };
+        }
       } else {
         updatedRecords.push({
           id: `new-${Date.now()}`,
@@ -86,13 +95,33 @@ const AttendanceSection: React.FC<AttendanceProps> = ({ selectedClassId = 'all' 
     });
   };
 
+  const updateArrivalTime = (studentId: string, time: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    setAttendanceRecords(prev => {
+      const existingIdx = prev.findIndex(r => r.studentId === studentId && r.date === today);
+      if (existingIdx === -1) return prev;
+      const updatedRecords = [...prev];
+      updatedRecords[existingIdx] = {
+        ...updatedRecords[existingIdx],
+        arrivalTime: time
+      };
+      return updatedRecords;
+    });
+  };
+
   const updateStatus = (studentId: string, status: 'present' | 'absent', dateStr?: string) => {
     const targetDate = dateStr || new Date().toISOString().split('T')[0];
     setAttendanceRecords(prev => {
       const existingIdx = prev.findIndex(r => r.studentId === studentId && r.date === targetDate);
       const updatedRecords = [...prev];
       if (existingIdx > -1) {
-        updatedRecords[existingIdx] = { ...updatedRecords[existingIdx], status };
+        // Se cambio stato (es. da presente a assente), pulisco anche eventuali note di ritardo
+        updatedRecords[existingIdx] = { 
+          ...updatedRecords[existingIdx], 
+          status,
+          arrivalTime: status === 'absent' ? undefined : updatedRecords[existingIdx].arrivalTime,
+          notes: status === 'absent' ? undefined : updatedRecords[existingIdx].notes
+        };
       } else {
         updatedRecords.push({
           id: `new-${Date.now()}`,
@@ -228,7 +257,7 @@ const AttendanceSection: React.FC<AttendanceProps> = ({ selectedClassId = 'all' 
                 <tr>
                   <th className="px-8 py-5">Identificativo Alunno</th>
                   <th className="px-8 py-5">Stato</th>
-                  <th className="px-8 py-5">Orario</th>
+                  <th className="px-8 py-5">Orario Arrivo</th>
                   <th className="px-8 py-5">Note</th>
                   <th className="px-8 py-5 text-right">Opzioni</th>
                 </tr>
@@ -252,19 +281,49 @@ const AttendanceSection: React.FC<AttendanceProps> = ({ selectedClassId = 'all' 
                       </td>
                       <td className="px-8 py-5">
                         <div className="flex gap-2">
-                          <button onClick={() => updateStatus(student.id, 'present')} className={`p-2 rounded-lg border transition-all ${record?.status === 'present' ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white text-slate-300'}`}><Check size={16}/></button>
-                          <button onClick={() => handleQuickDelay(student.id)} className={`p-2 rounded-lg border transition-all ${isLate ? 'bg-amber-500 border-amber-600 text-white' : 'bg-white text-slate-300'}`}><AlertCircle size={16}/></button>
-                          <button onClick={() => updateStatus(student.id, 'absent')} className={`p-2 rounded-lg border transition-all ${record?.status === 'absent' ? 'bg-rose-500 border-rose-600 text-white' : 'bg-white text-slate-300'}`}><X size={16}/></button>
+                          <button 
+                            onClick={() => updateStatus(student.id, 'present')} 
+                            title="Segna Presente"
+                            className={`p-2 rounded-lg border transition-all ${record?.status === 'present' && !isLate ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white text-slate-300 hover:border-emerald-200'}`}
+                          >
+                            <Check size={16}/>
+                          </button>
+                          <button 
+                            onClick={() => handleQuickDelay(student.id)} 
+                            title={isLate ? "Rimuovi Ritardo" : "Segna Ritardo"}
+                            className={`p-2 rounded-lg border transition-all ${isLate ? 'bg-amber-500 border-amber-600 text-white shadow-inner' : 'bg-white text-slate-300 hover:border-amber-200'}`}
+                          >
+                            <AlertCircle size={16}/>
+                          </button>
+                          <button 
+                            onClick={() => updateStatus(student.id, 'absent')} 
+                            title="Segna Assente"
+                            className={`p-2 rounded-lg border transition-all ${record?.status === 'absent' ? 'bg-rose-500 border-rose-600 text-white' : 'bg-white text-slate-300 hover:border-rose-200'}`}
+                          >
+                            <X size={16}/>
+                          </button>
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                         <span className="text-xs font-bold text-slate-600">{record?.arrivalTime || '--:--'}</span>
+                         {isLate ? (
+                           <div className="flex items-center gap-2 group/time">
+                             <input 
+                               type="time" 
+                               className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-indigo-600 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 outline-none transition-all"
+                               value={record?.arrivalTime || ''}
+                               onChange={(e) => updateArrivalTime(student.id, e.target.value)}
+                             />
+                             <Clock size={12} className="text-amber-500 opacity-50 group-hover/time:opacity-100 transition-opacity" />
+                           </div>
+                         ) : (
+                           <span className="text-xs font-bold text-slate-400 italic">--:--</span>
+                         )}
                       </td>
                       <td className="px-8 py-5">
                          <span className="text-xs italic text-slate-400">{record?.notes || '-'}</span>
                       </td>
                       <td className="px-8 py-5 text-right">
-                         <button className="p-2 text-slate-300 hover:text-indigo-600"><Save size={18}/></button>
+                         <button className="p-2 text-slate-300 hover:text-indigo-600" title="Salva Modifiche"><Save size={18}/></button>
                       </td>
                     </tr>
                   );

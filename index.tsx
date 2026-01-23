@@ -9,33 +9,8 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{ padding: 20, color: 'red' }}>
-          <h1>Qualcosa è andato storto.</h1>
-          <pre>{this.state.error?.toString()}</pre>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 root.render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
+    <App />
   </React.StrictMode>
 );
