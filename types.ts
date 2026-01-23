@@ -35,6 +35,11 @@ export interface ClassRoom {
   description?: string;
 }
 
+export interface DailySchedule {
+  open: string;
+  close: string;
+}
+
 export interface SchoolConfig {
   name: string;
   address: string;
@@ -46,10 +51,12 @@ export interface SchoolConfig {
   website?: string;
   socialFacebook?: string;
   socialInstagram?: string;
-  openingTime: string;
-  closingTime: string;
   maxStudentsPerClass: number;
   isSaturdayOpen: boolean;
+  schedule: {
+    weekdays: DailySchedule;
+    saturday: DailySchedule;
+  };
 }
 
 export interface Ingredient {
@@ -66,7 +73,7 @@ export interface MenuItem {
   secondCourse: string;
   side: string;
   fruit: string;
-  allergens?: string[]; // Esempi: 'glutine', 'lattosio', 'uova'
+  allergens?: string[];
 }
 
 export interface StaffMember {
@@ -79,6 +86,16 @@ export interface StaffMember {
   assignedClass?: string;
 }
 
+export interface StaffAttendanceRecord {
+  id: string;
+  staffId: string;
+  date: string;
+  checkIn: string;
+  checkOut?: string;
+  isEarlyDeparture: boolean;
+  reason?: string;
+}
+
 export interface AttendanceRecord {
   id: string;
   studentId: string;
@@ -86,6 +103,8 @@ export interface AttendanceRecord {
   status: 'present' | 'absent';
   arrivalTime?: string;
   departureTime?: string;
+  isEarlyDeparture?: boolean;
+  pickupPerson?: string;
   notes?: string;
 }
 
@@ -105,7 +124,7 @@ export interface Student {
   isPresent: boolean;
   paymentStatus: 'paid' | 'pending' | 'overdue';
   allergies?: string[];
-  dietaryPreference: DietaryPreference; // Nuova proprietà
+  dietaryPreference: DietaryPreference;
   parentName: string;
   birthDate?: string;
   address?: string;

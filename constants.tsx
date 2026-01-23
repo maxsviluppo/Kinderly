@@ -46,10 +46,12 @@ export const MOCK_SCHOOL_CONFIG: SchoolConfig = {
   website: "www.scuolailgirasole.it",
   socialFacebook: "facebook.com/scuolailgirasole",
   socialInstagram: "instagram.com/ilgirasole_kids",
-  openingTime: "08:00",
-  closingTime: "16:30",
   maxStudentsPerClass: 25,
-  isSaturdayOpen: true
+  isSaturdayOpen: true,
+  schedule: {
+    weekdays: { open: "08:00", close: "16:30" },
+    saturday: { open: "08:30", close: "12:30" }
+  }
 };
 
 export const MOCK_INGREDIENTS: Ingredient[] = [
@@ -118,24 +120,19 @@ export const MOCK_STUDENTS: Student[] = [
 ];
 
 export const MOCK_ATTENDANCE: AttendanceRecord[] = [];
-
 export const MOCK_FINANCE: FinancialRecord[] = [
   { id: '1', type: 'income', category: 'Rette Ottobre', amount: 16500, date: '2023-10-01', description: 'Incasso rette mensili' },
   { id: '2', type: 'expense', category: 'Affitto', amount: 3500, date: '2023-10-05', description: 'Canone locazione mensile' },
 ];
-
 export const MOCK_MEETINGS: Meeting[] = [
   { id: '1', title: 'Collegio Docenti Straordinario', date: '2023-10-25', time: '17:00', participants: 'Tutto lo staff docente', type: 'faculty' },
 ];
-
 export const MOCK_CONVERSATIONS = [
   { studentId: '1', lastMessage: 'Grazie per l\'informazione', timestamp: '10:30', unreadCount: 0 },
 ];
-
-export const MOCK_MESSAGES: Record<string, {senderId: string, text: string, timestamp: string}[]> = {
+export const MOCK_MESSAGES: Record<string, any[]> = {
   '1': [{ senderId: 'parent', text: 'Buongiorno, Marco ha la febbre oggi.', timestamp: '08:00' }],
 };
-
 export const MOCK_DISCIPLINARY: DisciplinaryAction[] = [];
 export const MOCK_MAINTENANCE: MaintenanceTask[] = [];
 export const MOCK_MEDICAL_CHECKS: MedicalCheck[] = [];

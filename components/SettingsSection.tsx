@@ -2,22 +2,9 @@
 import React, { useState } from 'react';
 import { MOCK_SCHOOL_CONFIG, MOCK_STAFF } from '../constants';
 import { 
-  Building2, 
-  Clock, 
-  Phone, 
-  Smartphone,
-  MapPin, 
-  Globe, 
-  Mail, 
-  ShieldCheck, 
-  Facebook, 
-  Instagram, 
-  HardHat, 
-  FileText, 
-  Save, 
-  Plus,
-  Hash,
-  CalendarDays
+  Building2, Clock, Phone, Smartphone, MapPin, Globe, Mail, 
+  ShieldCheck, Facebook, Instagram, HardHat, FileText, Save, Plus,
+  Hash, CalendarDays, ArrowRight, Sun, Moon, AlertTriangle
 } from 'lucide-react';
 import { SchoolConfig } from '../types';
 
@@ -31,154 +18,159 @@ const SettingsSection: React.FC = () => {
     setConfig(prev => ({ ...prev, isSaturdayOpen: !prev.isSaturdayOpen }));
   };
 
+  const updateSchedule = (key: 'weekdays' | 'saturday', field: 'open' | 'close', value: string) => {
+    setConfig(prev => ({
+      ...prev,
+      schedule: {
+        ...prev.schedule,
+        [key]: {
+          ...prev.schedule[key],
+          [field]: value
+        }
+      }
+    }));
+  };
+
   return (
-    <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-500">
+    <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-slate-800 tracking-tight">Configurazione Istituto</h2>
-          <p className="text-slate-500 font-medium italic">Personalizzazione dei dati istituzionali, contatti digitali e organico.</p>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tight">Impostazioni Istituto</h2>
+          <p className="text-slate-500 font-medium italic">Configurazione orari, servizi e organico amministrativo.</p>
         </div>
-        <button className="bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center gap-3 active:scale-95">
-          <Save size={18} /> Salva Configurazione
+        <button className="bg-indigo-600 text-white px-8 py-4 rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center gap-3 active:scale-95">
+          <Save size={20} /> Salva Configurazione
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Colonna Sinistra: Anagrafica e Contatti */}
         <div className="lg:col-span-2 space-y-8">
           
-          {/* Anagrafica Base */}
-          <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm space-y-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <Building2 size={120} />
-            </div>
-            <h3 className="text-lg font-black text-slate-800 flex items-center gap-3 border-b border-slate-50 pb-4">
-              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Building2 size={20}/></div>
-              Anagrafica Scuola
+          {/* Orari Operativi - MODIFICATO */}
+          <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm space-y-10">
+            <h3 className="text-xl font-black text-slate-800 flex items-center gap-4 border-b border-slate-50 pb-6">
+              <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl"><Clock size={24}/></div>
+              Gestione Orari di Apertura
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <SettingInput label="Denominazione Ufficiale" value={config.name} icon={<Building2 size={16}/>} />
-              </div>
-              <div className="md:col-span-2">
-                <SettingInput label="Indirizzo Sede Operativa" value={config.address} icon={<MapPin size={16}/>} />
-              </div>
-              
-              {/* Sabato Lavorativo Toggle */}
-              <div className="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                   <div className="p-3 bg-white rounded-2xl border border-slate-100 text-indigo-600"><CalendarDays size={20}/></div>
-                   <div>
-                     <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Calendario Corto / Lungo</p>
-                     <p className="text-xs text-slate-500 font-medium">Abilita o disabilita le attività didattiche e la mensa per il Sabato.</p>
-                   </div>
-                </div>
-                <button 
-                  onClick={handleToggleSaturday}
-                  className={`w-16 h-8 rounded-full transition-all relative ${config.isSaturdayOpen ? 'bg-emerald-500 shadow-inner' : 'bg-slate-300'}`}
-                >
-                  <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all ${config.isSaturdayOpen ? 'left-9' : 'left-1'}`}></div>
-                </button>
-              </div>
 
-              <SettingInput label="Telefono Fisso" value={config.phone} icon={<Phone size={16}/>} />
-              <SettingInput label="Cellulare Emergenze" value={config.mobilePhone || ''} icon={<Smartphone size={16}/>} />
-              <div className="grid grid-cols-2 gap-4">
-                <SettingInput label="Apertura" value={config.openingTime} type="time" icon={<Clock size={16}/>} />
-                <SettingInput label="Chiusura" value={config.closingTime} type="time" icon={<Clock size={16}/>} />
-              </div>
-              <SettingInput label="Capienza Massima (Totale)" value={config.maxStudentsPerClass.toString()} icon={<Hash size={16}/>} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               {/* Feriali */}
+               <div className="space-y-6">
+                  <div className="flex items-center gap-3 bg-indigo-50 p-3 rounded-2xl border border-indigo-100">
+                    <Sun size={18} className="text-indigo-600" />
+                    <span className="text-xs font-black text-indigo-700 uppercase tracking-widest">Giorni Feriali (Lun-Ven)</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Entrata</label>
+                        <input 
+                          type="time" 
+                          value={config.schedule.weekdays.open}
+                          onChange={(e) => updateSchedule('weekdays', 'open', e.target.value)}
+                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all"
+                        />
+                     </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Uscita</label>
+                        <input 
+                          type="time" 
+                          value={config.schedule.weekdays.close}
+                          onChange={(e) => updateSchedule('weekdays', 'close', e.target.value)}
+                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all"
+                        />
+                     </div>
+                  </div>
+               </div>
+
+               {/* Sabato */}
+               <div className="space-y-6">
+                  <div className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${config.isSaturdayOpen ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                    <div className="flex items-center gap-3">
+                      <Moon size={18} />
+                      <span className="text-xs font-black uppercase tracking-widest">Apertura Sabato</span>
+                    </div>
+                    <button 
+                      onClick={handleToggleSaturday}
+                      className={`w-12 h-6 rounded-full transition-all relative ${config.isSaturdayOpen ? 'bg-emerald-600' : 'bg-slate-300'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all ${config.isSaturdayOpen ? 'left-7' : 'left-1'}`}></div>
+                    </button>
+                  </div>
+                  
+                  {config.isSaturdayOpen ? (
+                    <div className="grid grid-cols-2 gap-4 animate-in zoom-in-95 duration-300">
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Entrata</label>
+                          <input 
+                            type="time" 
+                            value={config.schedule.saturday.open}
+                            onChange={(e) => updateSchedule('saturday', 'open', e.target.value)}
+                            className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all"
+                          />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Uscita</label>
+                          <input 
+                            type="time" 
+                            value={config.schedule.saturday.close}
+                            onChange={(e) => updateSchedule('saturday', 'close', e.target.value)}
+                            className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all"
+                          />
+                       </div>
+                    </div>
+                  ) : (
+                    <div className="h-[74px] flex items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
+                       <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Istituto Chiuso</span>
+                    </div>
+                  )}
+               </div>
+            </div>
+            
+            <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 flex gap-4">
+               <AlertTriangle className="text-amber-600 shrink-0" size={24} />
+               <p className="text-xs text-amber-800 font-bold leading-relaxed">
+                  Le modifiche agli orari impattano automaticamente la generazione dei turni del personale e le proiezioni dei costi mensa. Assicurarsi di aver comunicato eventuali variazioni alle famiglie.
+               </p>
             </div>
           </div>
 
-          {/* Contatti Digitali & Social */}
-          <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm space-y-6 relative overflow-hidden">
-            <h3 className="text-lg font-black text-slate-800 flex items-center gap-3 border-b border-slate-100 pb-4">
-              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><Globe size={20}/></div>
-              Presenza Digitale & Social
+          {/* Dati Istituzionali */}
+          <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm space-y-8">
+             <h3 className="text-xl font-black text-slate-800 flex items-center gap-4 border-b border-slate-50 pb-6">
+              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><Building2 size={24}/></div>
+              Anagrafica & Recapiti
             </h3>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <SettingInput label="Sito Web Ufficiale" value={config.website || ''} icon={<Globe size={16}/>} placeholder="www.esempio.it" />
-              </div>
-              <SettingInput label="Email Primaria (Info)" value={config.emailPrimary} icon={<Mail size={16}/>} />
-              <SettingInput label="Email Secondaria (Didattica)" value={config.emailSecondary || ''} icon={<Mail size={16}/>} />
-              <div className="md:col-span-2">
-                <SettingInput label="Posta Elettronica Certificata (PEC)" value={config.pec} icon={<ShieldCheck size={16}/>} colorClass="text-indigo-600" />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pagina Facebook</label>
-                <div className="relative">
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-600"><Facebook size={16}/></div>
-                  <input 
-                    type="text" 
-                    defaultValue={config.socialFacebook}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 outline-none transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Profilo Instagram</label>
-                <div className="relative">
-                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-rose-500"><Instagram size={16}/></div>
-                  <input 
-                    type="text" 
-                    defaultValue={config.socialInstagram}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 outline-none transition-all"
-                  />
-                </div>
-              </div>
+               <SettingInput label="Denominazione Sede" value={config.name} icon={<Building2 size={16}/>} />
+               <SettingInput label="PEC Istituzionale" value={config.pec} icon={<Mail size={16}/>} />
+               <div className="md:col-span-2">
+                 <SettingInput label="Indirizzo Legale" value={config.address} icon={<MapPin size={16}/>} />
+               </div>
+               <SettingInput label="Telefono Fisso" value={config.phone} icon={<Phone size={16}/>} />
+               <SettingInput label="Cellulare Direzione" value={config.mobilePhone || ''} icon={<Smartphone size={16}/>} />
             </div>
           </div>
         </div>
 
-        {/* Colonna Destra: Staff e Manutenzione */}
+        {/* Sidebar Impostazioni */}
         <div className="space-y-8">
-           <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm relative overflow-hidden">
-             <div className="flex justify-between items-center mb-6 border-b border-slate-50 pb-4">
-                <h3 className="text-lg font-black text-slate-800 flex items-center gap-3">
-                  <div className="p-2 bg-slate-100 text-slate-600 rounded-xl"><FileText size={20}/></div>
-                  Segreteria
-                </h3>
-                <button className="p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all"><Plus size={18}/></button>
-             </div>
-             <div className="space-y-3">
-                {adminStaff.map(member => (
-                  <div key={member.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all group">
-                    <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{member.name}</p>
-                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-1">{member.specificRole}</p>
-                  </div>
-                ))}
-             </div>
+           <div className="bg-slate-900 p-8 rounded-[48px] text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10"><ShieldCheck size={100}/></div>
+              <h4 className="text-lg font-black mb-6 flex items-center gap-3">
+                 <ShieldCheck className="text-emerald-400" /> Sicurezza Dati
+              </h4>
+              <p className="text-sm text-slate-400 mb-8 leading-relaxed italic font-medium">Il sistema Kinderly è conforme ai protocolli GDPR per il trattamento dei dati sensibili degli alunni.</p>
+              <div className="space-y-4">
+                 <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500">Backup Cloud</span>
+                    <span className="text-emerald-400 font-black uppercase">Attivo</span>
+                 </div>
+                 <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500">Crittografia P2P</span>
+                    <span className="text-emerald-400 font-black uppercase">Attivo</span>
+                 </div>
+              </div>
            </div>
-
-           <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm">
-             <div className="flex justify-between items-center mb-6 border-b border-slate-50 pb-4">
-                <h3 className="text-lg font-black text-slate-800 flex items-center gap-3">
-                  <div className="p-2 bg-amber-50 text-amber-600 rounded-xl"><HardHat size={20}/></div>
-                  Ausiliari ATA
-                </h3>
-                <button className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-all"><Plus size={18}/></button>
-             </div>
-             <div className="space-y-3">
-                {ataStaff.map(member => (
-                  <div key={member.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-amber-200 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-white rounded-xl border border-slate-200 flex items-center justify-center font-bold text-slate-400">{member.name.charAt(0)}</div>
-                      <div>
-                        <p className="font-bold text-slate-800 text-sm leading-tight">{member.name}</p>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{member.specificRole}</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-black text-slate-500">{member.hoursPerWeek}h</span>
-                  </div>
-                ))}
-             </div>
-          </div>
         </div>
       </div>
     </div>
@@ -190,18 +182,17 @@ const SettingInput: React.FC<{
   value: string; 
   type?: string; 
   icon?: React.ReactNode; 
-  placeholder?: string;
-  colorClass?: string;
-}> = ({label, value, type="text", icon, placeholder, colorClass}) => (
+  onChange?: (val: string) => void;
+}> = ({label, value, type="text", icon, onChange}) => (
   <div className="space-y-2 group">
-    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600 transition-colors">{label}</label>
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 group-focus-within:text-indigo-600 transition-colors">{label}</label>
     <div className="relative">
-      <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${colorClass || 'text-slate-400'}`}>{icon}</div>
+      <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">{icon}</div>
       <input 
         type={type} 
-        defaultValue={value}
-        placeholder={placeholder}
-        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 outline-none transition-all placeholder:text-slate-300"
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 outline-none transition-all"
       />
     </div>
   </div>
