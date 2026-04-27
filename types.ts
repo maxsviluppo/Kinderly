@@ -14,30 +14,17 @@ export enum AppSection {
   DISCIPLINARY = 'DISCIPLINARY'
 }
 
-export type TeacherRole = 'prevalente' | 'sostegno' | 'potenziamento' | 'specialista' | 'assistente';
-export type DietaryPreference = 'ordinario' | 'vegetariano' | 'vegano' | 'celiaco' | 'senza_lattosio';
+export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
 
-export interface ClassTeacherAssignment {
-  teacherId: string;
-  role: TeacherRole;
-  subject?: string;
-  hoursPerWeek: number;
-  isRotation: boolean;
-  rotationFrequency?: 'weekly' | 'biweekly' | 'monthly';
-}
-
-export interface ClassRoom {
+export interface DisciplinaryAction {
   id: string;
-  name: string;
-  capacity: number;
-  assignedTeachers: ClassTeacherAssignment[];
-  color: string;
-  description?: string;
-}
-
-export interface DailySchedule {
-  open: string;
-  close: string;
+  studentId: string;
+  type: DisciplinaryType;
+  description: string;
+  date: string;
+  consequence: string;
+  status: 'active' | 'resolved';
+  notifiedParent: boolean;
 }
 
 export interface SchoolConfig {
@@ -51,29 +38,12 @@ export interface SchoolConfig {
   website?: string;
   socialFacebook?: string;
   socialInstagram?: string;
-  maxStudentsPerClass: number;
+  openingTime: string;
+  closingTime: string;
   isSaturdayOpen: boolean;
-  schedule: {
-    weekdays: DailySchedule;
-    saturday: DailySchedule;
-  };
-}
-
-export interface Ingredient {
-  id: string;
-  name: string;
-  unit: 'kg' | 'l' | 'pz';
-  averagePrice: number;
-  category: 'freschi' | 'secco' | 'surgelati' | 'bevande';
-}
-
-export interface MenuItem {
-  day: string;
-  firstCourse: string;
-  secondCourse: string;
-  side: string;
-  fruit: string;
-  allergens?: string[];
+  openingTimeSaturday?: string;
+  closingTimeSaturday?: string;
+  maxStudentsPerClass: number;
 }
 
 export interface StaffMember {
@@ -86,36 +56,47 @@ export interface StaffMember {
   assignedClass?: string;
 }
 
-export interface StaffAttendanceRecord {
+export interface AssignedTeacher {
+  teacherId: string;
+  role: string; // e.g. "Main", "Support", "English"
+  subject?: string;
+  hoursPerWeek: number;
+  rotationFrequency: 'none' | 'daily' | 'weekly' | 'monthly';
+}
+
+export interface ClassRoom {
   id: string;
-  staffId: string;
-  date: string;
-  checkIn: string;
-  checkOut?: string;
-  isEarlyDeparture: boolean;
-  reason?: string;
+  name: string;
+  capacity: number;
+  teachers: AssignedTeacher[];
+  color: string;
+  description?: string;
 }
 
 export interface AttendanceRecord {
   id: string;
-  studentId: string;
+  studentId?: string; // Optional if it's a staff record
+  staffId?: string;   // Optional if it's a student record
   date: string;
-  status: 'present' | 'absent';
-  arrivalTime?: string;
-  departureTime?: string;
-  isEarlyDeparture?: boolean;
-  pickupPerson?: string;
+  status: 'present' | 'absent' | 'late' | 'early_exit';
+  arrivalTime?: string; // Entry punch
+  departureTime?: string; // Exit punch
+  isEarlyExit?: boolean;
+  earlyExitReason?: string;
+  delegatedPickup?: string; // For students
   notes?: string;
 }
 
 export type AcademicStatus = 'enrolled' | 'promoted' | 'held_back';
 
 export interface FamilyContact {
-  label: string;
+  label: string; // es. Madre, Padre, Nonno
   name: string;
   phone: string;
   email: string;
 }
+
+export type DietaryProfile = 'standard' | 'vegetarian' | 'vegan' | 'gluten_free' | 'lactose_free' | 'pescatarian' | 'halal' | 'kosher';
 
 export interface Student {
   id: string;
@@ -124,13 +105,20 @@ export interface Student {
   isPresent: boolean;
   paymentStatus: 'paid' | 'pending' | 'overdue';
   allergies?: string[];
-  dietaryPreference: DietaryPreference;
-  parentName: string;
+  dietaryProfile: DietaryProfile; // New field
+  parentName: string; // Riferimento principale
+  // Nuovi campi
   birthDate?: string;
   address?: string;
   photo?: string;
   academicStatus: AcademicStatus;
   contacts: FamilyContact[];
+  familyNotes?: string;
+}
+
+export interface Teacher extends StaffMember {
+  role: 'teacher';
+  schedule?: string[];
 }
 
 export interface MaintenanceTask {
@@ -165,24 +153,38 @@ export interface FinancialRecord {
   description: string;
 }
 
-export type DisciplinaryType = 'ammonimento' | 'educativo' | 'sospensione';
+// --- CANTEEN TYPES ---
 
-export interface DisciplinaryAction {
+export interface Ingredient {
   id: string;
-  studentId: string;
-  type: DisciplinaryType;
-  description: string;
-  date: string;
-  consequence: string;
-  status: 'active' | 'resolved';
-  notifiedParent: boolean;
+  name: string;
+  unit: string; // kg, l, pz
+  costPerUnit: number;
 }
 
-export interface Meeting {
+export interface Dish {
+  name: string;
+  ingredients: string[]; // List of ingredient names (simplification)
+  allergens: string[];
+  calories?: number;
+  foodCost: number; // Costo materie prime per porzione
+}
+
+export interface DailyMenu {
+  day: string; // Lunedì, Martedì, etc
+  date?: string; // Optional for specific dates
+  firstCourse: Dish;
+  secondCourse: Dish;
+  side: Dish;
+  fruit: Dish;
+  notes?: string;
+}
+
+export interface CanteenExpense {
   id: string;
-  title: string;
   date: string;
-  time: string;
-  participants: string;
-  type: 'faculty' | 'parents' | 'cda';
+  item: string;
+  vendor: string;
+  amount: number;
+  category?: string;
 }

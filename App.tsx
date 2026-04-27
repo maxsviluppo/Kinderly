@@ -15,11 +15,15 @@ import LogisticsSection from './components/LogisticsSection';
 import { AppSection } from './types';
 import { Menu, X, Bell, Search, HelpCircle, Sparkles } from 'lucide-react';
 
+import { MOCK_SCHOOL_CONFIG } from './constants';
+import { SchoolConfig } from './types';
+
 const App: React.FC = () => {
   const [activeSection, setActiveSection] = useState<AppSection>(AppSection.DASHBOARD);
   const [selectedClassId, setSelectedClassId] = useState<string | 'all'>('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showQuickHelp, setShowQuickHelp] = useState(false);
+  const [schoolConfig, setSchoolConfig] = useState<SchoolConfig>(MOCK_SCHOOL_CONFIG);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -28,11 +32,11 @@ const App: React.FC = () => {
       case AppSection.ATTENDANCE:
         return <AttendanceSection selectedClassId={selectedClassId} />;
       case AppSection.CLASSES:
-        return <ManagementSection type="students" selectedClassId={selectedClassId} />;
+        return <ManagementSection type="students" selectedClassId={selectedClassId} schoolConfig={schoolConfig} />;
       case AppSection.DISCIPLINARY:
         return <DisciplinarySection />;
       case AppSection.STAFF:
-        return <ManagementSection type="staff" selectedClassId={selectedClassId} />;
+        return <ManagementSection type="staff" selectedClassId={selectedClassId} schoolConfig={schoolConfig} />;
       case AppSection.COMMUNICATIONS:
         return <CommunicationsSection selectedClassId={selectedClassId} />;
       case AppSection.ACCOUNTING:
@@ -40,20 +44,20 @@ const App: React.FC = () => {
       case AppSection.LOGISTICS:
         return <LogisticsSection />;
       case AppSection.CANTEEN:
-        return <CanteenSection selectedClassId={selectedClassId} />;
+        return <CanteenSection selectedClassId={selectedClassId} schoolConfig={schoolConfig} />;
       case AppSection.MEETINGS:
         return <MeetingsSection selectedClassId={selectedClassId} />;
       case AppSection.AI_ADVISOR:
         return <AIAdvisor />;
       case AppSection.SETTINGS:
-        return <SettingsSection />;
+        return <SettingsSection config={schoolConfig} onUpdate={setSchoolConfig} />;
       default:
         return <div className="p-10 text-center text-slate-500">Sezione in fase di sviluppo.</div>;
     }
   };
 
   const getSectionName = (section: AppSection) => {
-    switch(section) {
+    switch (section) {
       case AppSection.DASHBOARD: return 'Dashboard';
       case AppSection.ATTENDANCE: return 'Appello';
       case AppSection.CLASSES: return 'Classi';
@@ -71,9 +75,9 @@ const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-[#f8fafc]">
-      <Sidebar 
-        activeSection={activeSection} 
-        onNavigate={setActiveSection} 
+      <Sidebar
+        activeSection={activeSection}
+        onNavigate={setActiveSection}
         selectedClassId={selectedClassId}
         onSelectClass={setSelectedClassId}
       />
@@ -94,7 +98,7 @@ const App: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => setActiveSection(AppSection.AI_ADVISOR)}
               className="p-2.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all flex items-center gap-2"
             >
